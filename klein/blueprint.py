@@ -20,10 +20,13 @@ class Blueprint(object):
         for fn, args, kwargs in self._recorded_registrations:
             fn(setup_state, *args, **kwargs)
 
+    def record(self, fn, args, kwargs):
+        self._recorded_registrations.append((fn, args, kwargs))
+
     def route(self, *args, **kwargs):
         def deco(f):
             route_args = [f] + args
-            self._recorded_registrations.append((_record_route, route_args, kwargs))
+            self.record(_record_route, route_args, kwargs)
             return f
         return deco
 
@@ -33,6 +36,6 @@ class Blueprint(object):
 
         def deco(f):
             handle_errors_args = [f, f_or_exception] + additional_exceptions
-            self._recorded_registrations.append((_record_handle_errors, handle_errors_args, kwargs))
+            self.record(_record_handle_errors, handle_errors_args, kwargs)
             return f
-    return deco
+        return deco
