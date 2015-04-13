@@ -1,14 +1,19 @@
 from collections import namedtuple
 
 
+
 SetupState = namedtuple('SetupState', ['blueprint', 'app', 'options'])
+
 
 
 def _record_route(state, f, *args, **kwargs):
     state.app.route(*args, **kwargs)(f)
 
+
+
 def _record_handle_errors(state, f, *args, **kwargs):
     state.app.handle_errors(*args, **kwargs)(f)
+
 
 
 class Blueprint(object):
@@ -29,7 +34,7 @@ class Blueprint(object):
 
     def route(self, *args, **kwargs):
         def deco(f):
-            route_args = [f] + args
+            route_args = [f] + list(args)
             self.record(_record_route, route_args, kwargs)
             return f
         return deco
@@ -39,7 +44,7 @@ class Blueprint(object):
             return self.handle_errors(Exception)(f_or_exception)
 
         def deco(f):
-            handle_errors_args = [f, f_or_exception] + additional_exceptions
+            handle_errors_args = [f, f_or_exception] + list(additional_exceptions)
             self.record(_record_handle_errors, handle_errors_args, kwargs)
             return f
         return deco
