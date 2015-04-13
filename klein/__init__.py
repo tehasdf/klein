@@ -1,4 +1,5 @@
 from klein.app import Klein, run, route, resource
+from klein.blueprint import Blueprint
 
 
 __version__ = "15.0.0"
