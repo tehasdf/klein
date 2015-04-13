@@ -20,7 +20,11 @@ class Blueprint(object):
         for fn, args, kwargs in self._recorded_registrations:
             fn(setup_state, *args, **kwargs)
 
-    def record(self, fn, args, kwargs):
+    def record(self, fn, args=None, kwargs=None):
+        if args is None:
+            args = []
+        if kwargs is None:
+            kwargs = {}
         self._recorded_registrations.append((fn, args, kwargs))
 
     def route(self, *args, **kwargs):
