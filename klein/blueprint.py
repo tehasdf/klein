@@ -7,6 +7,9 @@ SetupState = namedtuple('SetupState', ['blueprint', 'app', 'options'])
 def _record_route(state, f, *args, **kwargs):
     state.app.route(*args, **kwargs)(f)
 
+def _record_handle_errors(state, f, *args, **kwargs):
+    state.app.handle_errors(*args, **kwargs)(f)
+
 
 class Blueprint(object):
     def __init__(self):
@@ -23,3 +26,13 @@ class Blueprint(object):
             self._recorded_registrations.append((_record_route, route_args, kwargs))
             return f
         return deco
+
+    def handle_errors(self, f_or_exception, *additional_exceptions, **kwargs):
+        if not isinstance(f_or_exception, type) or not issubclass(f_or_exception, Exception):
+            return self.handle_errors(Exception)(f_or_exception)
+
+        def deco(f):
+            handle_errors_args = [f, f_or_exception] + additional_exceptions
+            self._recorded_registrations.append((_record_handle_errors, handle_errors_args, kwargs))
+            return f
+    return deco
